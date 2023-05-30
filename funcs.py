@@ -1,13 +1,15 @@
 import pandas as pd
+import math 
+from nilearn import datasets, image, masking, plotting, regions
 
-def fmri2words(text_data, Trs, section, delay = 5, window = 0.2) :
+def fmri2words(text_data, Trs, section, delay = 6, window = 0.2) :
   chunks = []
   text = text_data[text_data['section'] == section]
   for tr in range(Trs) :
     onset = tr*2-delay
     offset = onset + 2
     chunk_data = text[(text['onset']>= onset - window) & (text['offset']< offset + window)]
-    chunks.append(" ".join(list(chunk_data['word'])))
+    chunks.append(" ".join(list([chunk_data['word'],chunk_data['onsets']])))
   return chunks
 
 def text2fmri(textgrid, sent_n, delay = 5) :
@@ -15,11 +17,13 @@ def text2fmri(textgrid, sent_n, delay = 5) :
   chunks = []
   textgrid = textgrid.tiers
   chunk = ""
-  sent_i = 0
+  sent_i = 1
   idx_start = int(delay/2)
-  for interval in textgrid[0].intervals[1:]:
-    if interval.mark == "#":
-      chunk+= "."
+  for interval in textgrid[0].intervals :
+    # print(chunk)
+    if interval.mark == "#" or interval.mark == "sil" :
+      print(chunk)
+      chunk += "."
       if sent_i == sent_n :
         chunks.append(chunk[1:])
         idx_end = min(int((interval.maxTime + delay)/2)+1, 282)
@@ -30,5 +34,16 @@ def text2fmri(textgrid, sent_n, delay = 5) :
       sent_i += 1
       continue
     chunk += " " + interval.mark
-  return chunks, scan_idx
+  return [chunks, scan_idx]
+
+
+def text2idx(sects, delay = 0, window = 0) :
+  for sect in sects :
+    for sent in sect : 
+      onset = int((sent['onset'] + delay - window)/2)
+      offset = math.ceil((sent['offset'] + delay + window)/2)
+      sent['idx'] = slice(onset, offset)
+  return sects
+
+#def text2fmris()
 
