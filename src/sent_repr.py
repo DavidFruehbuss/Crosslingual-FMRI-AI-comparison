@@ -6,6 +6,9 @@ import argparse
 
 
 def main(lm, device, languages, PATH, OUTPATH, sent_len, BATCH_SIZE):
+    """
+    This function encodes the aligned words from the text_data folder using the specified language model.
+    """
     tokenizer = AutoTokenizer.from_pretrained(lm)
     model = AutoModelForMaskedLM.from_pretrained(lm)
     model = model.to(device)

@@ -1,6 +1,8 @@
 import pandas as pd
 from nltk.tree import Tree
 
+# Helper functions
+
 
 def fmri2words(text_data, Trs, section, delay=5, window=0.2):
     chunks = []

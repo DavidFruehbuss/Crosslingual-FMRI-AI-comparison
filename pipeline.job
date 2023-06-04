@@ -1,0 +1,45 @@
+#!/bin/bash
+
+#SBATCH --partition=gpu_titanrtx_shared_course
+#SBATCH --gres=gpu:1
+#SBATCH --job-name=brain
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=3
+#SBATCH --time=01:00:00
+#SBATCH --mem=32000M
+#SBATCH --output=atcs_pipeline_%A.out
+
+
+module purge
+module load 2021
+module load Anaconda3/2021.05
+
+# activate the environment
+source activate atcs
+
+# alignment chunks, intervals
+python align2text_lisa.py
+
+# create LM representations
+# monolingual
+python src/sent_repr.py --lm Geotrend/bert-base-fr-cased --languages FR --sent_len 1 2 
+python src/sent_repr.py --lm bert-base-uncased --languages EN --sent_len 1 2 
+python src/sent_repr.py --lm bert-base-chinese --languages CN --sent_len 1 2 
+
+# multilingual
+python src/sent_repr.py --lm xlm-roberta-base --languages FR EN CN --sent_len 1 2 
+
+# get sentiment scores
+python src/get_sentiments.py --language FR --sent_len 1 
+python src/get_sentiments.py --language EN --sent_len 1 
+python src/get_sentiments.py --language CN --sent_len 1
+
+python src/get_sentiments.py --language FR --sent_len 2
+python src/get_sentiments.py --language EN --sent_len 2 
+python src/get_sentiments.py --language CN --sent_len 2
+
+# inbetween LM comparision
+python src/subjects_model_to_model_RSA.py
+
+
+conda deactivate 

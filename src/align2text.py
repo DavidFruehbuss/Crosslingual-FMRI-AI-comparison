@@ -1,6 +1,6 @@
 import tgt
 import sys
-from funcs import (
+from src.funcs import (
     text2fmri,
     extract_sent_list_from_tree_file,
     align_trees_with_csv_annotations,
@@ -13,6 +13,9 @@ import pickle
 
 
 def main():
+    """
+    This script aligns the tree files with the csv files and saves the data as a pickle file.
+    """
     # SETTINGS
     PATH = Path("/project/gpuuva021/shared/FMRI-Data")
 
