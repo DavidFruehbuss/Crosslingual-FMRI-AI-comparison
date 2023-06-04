@@ -18,3 +18,4 @@ The code-base is structured as follows:
 ### Additional Material
 
 - The poster can be found [here](Poster.pdf).
+- The paper can be found [here](Paper.pdf).
